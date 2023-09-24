@@ -12,6 +12,19 @@ class Benchmark:
     indicator for the focal group, and a set of predictor and evaluation features fits 
     a boosted regression model.
 
+    Args:
+        data: A pandas DataFrame containing the data.
+        focal_indicator: A pandas Series indicating the focal group.
+        predictor_features: A list of strings indicating the predictor features.
+        evaluation_features: A list of strings indicating the evaluation features.
+
+    Attributes:
+        model: A fitted propensity score model.
+        pscore: A pandas Series containing the propensity scores.
+        wgt: A pandas Series containing the ATT weights.
+        Xpred: A pandas DataFrame containing the predictor features.
+        Xeval: A pandas DataFrame containing the evaluation features.
+        outcomes: A list of estimated treatment effects for each outcome variable.
     """
     def __init__(self, data, focal_indicator, predictor_features, evaluation_features):
         self.data = data
@@ -31,7 +44,16 @@ class Benchmark:
         self.outcomes = []
 
     def fit(self, lrate=0.1, nest=500):
-        """Fit a propensity score model"""
+        """
+        Fit a propensity score model using a Gradient Boosting Classifier.
+
+        Args:
+            lrate: The learning rate of the model.
+            nest: The number of estimators in the model.
+
+        Returns:
+            None.
+        """
 
         # set model params
         self.lrate = lrate
@@ -48,7 +70,19 @@ class Benchmark:
 
     def evaluate(self,digits=2):
         """
-        Compute a difference-in-means estimate for the focal hospital
+        Compute a difference-in-means estimate for the focal hospital.
+
+        This function uses a linear regression model to estimate the treatment effect
+        for the focal hospital. The model is fitted to the data from all hospitals,
+        with the focal hospital being the treatment group and all other hospitals being
+        the control group. The difference in the mean of the outcome variable between
+        the treatment and control groups is the estimated treatment effect.
+
+        Args:
+            digits: The number of digits to round the results to.
+
+        Returns:
+            A list of estimated treatment effects for each outcome variable.
         """
 
         Xtemp = self.Xpred.copy()
@@ -65,7 +99,19 @@ class Benchmark:
         return self.outcomes
 
     def calc_balance(self):
-        """Print balance statistics"""
+        """
+        Print balance statistics for all variables in the Xpred DataFrame.
+
+        This function calls the `_balance()` function to calculate the weighted balance
+        statistics for ATT weights. The results are printed to the console.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+        """
+
         # TODO: Store a pandas dataframe with balance statistics
         for v in self.Xpred.columns:
             bal = self._balance(var=v, X=self.Xpred, tr=self.tr, wgt=self.wgt)
@@ -74,6 +120,13 @@ class Benchmark:
     def _wt_att(self, y, score):
         """
         Calculate Average Treatment Effect on the Treated (ATT) weights.
+
+        Args:
+            y: A Series indicating the treatment group.
+            score: A Series of propensity scores.
+
+        Returns:
+            A Series of ATT weights.
         """
         weight = score / (1 - score)
 
@@ -86,7 +139,16 @@ class Benchmark:
         """
         Compute weighted balance statistics for ATT weights
 
-        Weights are assumed to be 1 where y=True
+        Args:
+            var: The name of the variable to be balanced.
+            X: A DataFrame containing the data.
+            tr: A boolean Series indicating the treatment group.
+            wgt: A Series of weights.
+            digits: The number of digits to round the results to.
+
+        Returns:
+            A tuple of two floats, representing the mean of the variable in the
+            treatment group and the weighted mean of the variable in the control group.
         """
 
         tab = X[var]
