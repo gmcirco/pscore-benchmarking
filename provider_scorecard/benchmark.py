@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import GradientBoostingClassifier
 
+from sklearn.linear_model import LinearRegression
+from xgboost.sklearn import XGBClassifier
 
 class Benchmark:
     """
@@ -59,7 +59,7 @@ class Benchmark:
         self.lrate = lrate
         self.nest = nest
 
-        self.model = GradientBoostingClassifier(
+        self.model = XGBClassifier(
             learning_rate=self.lrate, n_estimators=self.nest
         )
         self.model.fit(self.Xpred, self.tr)
