@@ -43,7 +43,7 @@ class Benchmark:
         # list to hold results
         self.outcomes = []
 
-    def fit(self, lrate=0.1, nest=500):
+    def fit(self, lrate=0.1, nest=500, **kwargs):
         """
         Fit a propensity score model using a Gradient Boosting Classifier.
 
@@ -60,7 +60,7 @@ class Benchmark:
         self.nest = nest
 
         self.model = XGBClassifier(
-            learning_rate=self.lrate, n_estimators=self.nest
+            learning_rate=self.lrate, n_estimators=self.nest, **kwargs
         )
         self.model.fit(self.Xpred, self.tr)
 
