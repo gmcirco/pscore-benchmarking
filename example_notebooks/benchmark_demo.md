@@ -207,24 +207,12 @@ mod_list[0].calc_balance()
 We can then also extract our results as well. The values below describe
 the predicted difference between our focal hospital and the weighted
 peer comparison hospital.
+
 ``` python
 res_list[0]
 ```
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
