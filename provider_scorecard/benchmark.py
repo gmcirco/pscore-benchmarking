@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
+import statsmodels.api as sm
 
-from sklearn.linear_model import LinearRegression
 from xgboost.sklearn import XGBClassifier
 
 class Benchmark:
@@ -87,14 +87,15 @@ class Benchmark:
 
         Xtemp = self.Xpred.copy()
         Xtemp['tr'] = self.tr
+        Xtemp = Xtemp.astype(float)
 
         for i in self.Xeval.columns:
-            regr = LinearRegression()
-            regr.fit(Xtemp, self.Xeval[i], sample_weight=self.wgt)
+            regr = sm.WLS(self.Xeval[i],Xtemp,weights=self.wgt).fit()
 
-            # get coefficient for treatment
-            res = round(regr.coef_[len(Xtemp.columns)-1],digits)
-            self.outcomes.append(res)
+            # get coefficient and se for treatment
+            res = round(regr.params['tr'],digits)
+            se_res = round(regr.bse['tr'],digits)
+            self.outcomes.append((res, se_res))
 
         return self.outcomes
 
